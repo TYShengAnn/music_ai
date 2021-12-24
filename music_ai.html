@@ -1,0 +1,60 @@
+<html>
+<head>  
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0"></script>
+  <!--Tone.js and tfjs for the model-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.58/Tone.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/1.2.8/tf.min.js"></script>
+  <!-- Core library, since we're going to use a player -->
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/core.js"></script>
+  <!--Model we want to use -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/music_vae.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/coconet.js"></script>
+</head>
+<body>
+  <h1>Here is a demo for Magenta</h1>
+  <button onclick="playmusic()">Play music</button>
+<script>
+  midies = localStorage["midi"];
+  console.log(midies)
+  function playmusic() {
+    // Each bundle exports a global object with the name of the bundle.
+    let player = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus');
+    //...
+    // const mvae = new music_vae.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small');
+    // mvae.initialize().then(() => {
+    //   mvae.sample(1).then((samples) => player.start(samples[0]));
+    // });
+    const ANOTHER_MUSIC = {
+      notes: [
+        {pitch: 69, quantizedStartStep: 0, quantizedEndStep: 2, instrument: 0},
+        {pitch: 71, quantizedStartStep: 2, quantizedEndStep: 4, instrument: 0},
+        {pitch: 73, quantizedStartStep: 4, quantizedEndStep: 6, instrument: 0},
+        {pitch: 74, quantizedStartStep: 6, quantizedEndStep: 8, instrument: 0},
+        {pitch: 76, quantizedStartStep: 8, quantizedEndStep: 10, instrument: 0},
+        {pitch: 81, quantizedStartStep: 12, quantizedEndStep: 16, instrument: 0},
+        {pitch: 78, quantizedStartStep: 16, quantizedEndStep: 20, instrument: 0},
+        {pitch: 81, quantizedStartStep: 20, quantizedEndStep: 24, instrument: 0},
+        {pitch: 76, quantizedStartStep: 24, quantizedEndStep: 32, instrument: 0}
+      ],
+      quantizationInfo: {stepsPerQuarter: 4},
+      totalQuantizedSteps: 32
+      // predictFromPianoroll: 0
+    }
+    let conet = new coconet.Coconet('https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach')
+    conet.initialize().then(() => {
+      conet.infill(ANOTHER_MUSIC, {numIteations: 1}).then((result) => {
+        console.log(result)
+        console.log(result.notes)
+        console.log(1000)
+        let Answer = {}
+        Answer.notes = result.nodes
+        Answer.quantizationInfo = result.quantizationInfo
+        Answer.totalQuantizedSteps = result.totalQuantizedSteps
+        player.start(result)
+      })
+    });
+  }
+</script>
+</body>
+</html>
